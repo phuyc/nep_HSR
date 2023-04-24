@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "async-mutex": "^0.4.0",
+    "better-sqlite3": "^7.6.2",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.1",
+    "node-fetch": "^2.6.7",
+    "sharp": "^0.31.3",
+    "string-similarity": "^4.0.4"
+  }
+}
