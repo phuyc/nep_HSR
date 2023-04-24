@@ -28,7 +28,7 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         if (TIMEOUT[interaction.user.id]) {
-            interaction.editReply(`Please try again in ${new Date().getTime() - TIMEOUT[interaction.user.id]}`);
+            interaction.editReply(`Please try again in ${5000 - new Date().getTime() + TIMEOUT[interaction.user.id]}ms`);
             return;
         }
 
