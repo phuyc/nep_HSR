@@ -51,7 +51,13 @@ async function autoUpdate() {
                     },
                 ])
                 .toFile(`./images/assets/cards/${jsonChar.name}.png`)
-                
+
+                await sharp(`./images/assets/cards/${jsonChar.name}.png`)
+                .resize({
+                    width: 336,
+                    height: 224
+                })
+                .toFile(`./images/assets/rotated_cards/${jsonChar.name}.png`)
         }
     }
     // Light cones
@@ -111,6 +117,13 @@ async function autoUpdate() {
                     },
                 ])
                 .toFile(`./images/assets/cards/${lCJson.name}.png`)
+            
+            await sharp(`./images/assets/cards/${lCJson.name}.png`)
+                .resize({
+                    width: 336,
+                    height: 224
+                })
+                .toFile(`./images/assets/rotated_cards/${lCJson.name}.png`)
         }
     }
 
