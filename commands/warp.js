@@ -5,6 +5,8 @@ const Database = require("better-sqlite3");
 const gachaStandard = require("../helpers/gachaStandard");
 const gachaOriented = require("../helpers/gachaOriented");
 
+const TIMEOUT = {};
+
 // Mutex
 const mutex = new Mutex();
 
@@ -25,9 +27,19 @@ module.exports = {
                 )
                 .setRequired(true)),
     async execute(interaction) {
+        if (TIMEOUT[interaction.user.id]) {
+            interaction.editReply(`Please try again in ${new Date().getTime() - TIMEOUT[interaction.user.id]}`);
+            return;
+        }
+
         await mutex.runExclusive(async () => {
             const banner = interaction.options.getString('banner');
             
+            TIMEOUT[interaction.user.id] = new Date().getTime();
+            setTimeout(() => {
+                delete TIMEOUT[interaction.user.id];
+            }, 5000)
+
             // Gacha
             let results = [];
             results = banner === 'standard' ? gachaStandard(banner, interaction.user.id) : gachaOriented(banner, interaction.user.id);
