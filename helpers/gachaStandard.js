@@ -85,7 +85,7 @@ function warp4(banner, id) {
 }
 
 function warp5standard(banner, id) {
-    let result = db.prepare(`SELECT name FROM ${types[Math.floor(Math.random() * types.length)]} WHERE rarity=5 AND is_gacha IS NULL ORDER BY RANDOM() LIMIT 1`).get();
+    let result = db.prepare(`SELECT name FROM ${types[Math.floor(Math.random() * types.length)]} WHERE rarity=5 AND is_gacha AND NOT name='Seele' IS NULL ORDER BY RANDOM() LIMIT 1`).get();
     
     db.prepare(`UPDATE users SET pity_4_${banner}=pity_4_${banner}+1 WHERE user_id=?`).run(id);
     db.prepare(`UPDATE users SET pity_5_${banner}=0 WHERE user_id=?`).run(id);
