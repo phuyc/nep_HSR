@@ -28,29 +28,27 @@ function gachaOriented(banner, id) {
 
         // Rate (Accounted for soft pity)
         const characterRates = {
-            '3': 94.3 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 73, 0) * 6,
-            '4': 96.85 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 73, 0) * 6,
-            '4up': 99.4 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 73, 0) * 6,
-            '5': 99.7 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 73, 0) * 3,
+            '3': 94.3 - Math.max(parseInt(pity5) - 73, 0) * 6 - Math.max(parseInt(pity4) - 8, 0) * 51,
+            '4': 96.85 - Math.max(parseInt(pity5) - 73, 0) * 6 - Math.max(parseInt(pity4) - 8, 0) * 25.5,
+            '4up': 99.4 - Math.max(parseInt(pity5) - 73, 0) * 6 - Math.max(parseInt(pity4) - 8, 0) * 25.5,
+            '5': 99.7 - Math.max(parseInt(pity5) - 73, 0) * 3,
             '5up': 100,
         }
         
         const lightConeRates = {
-            '3': 92.6 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 62, 0) * 7,
-            '4': 97.55 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 62, 0) * 7,
-            '4up': 99.2 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 62, 0) * 7,
-            '5': 99.4 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 62, 0) * 3.5,
+            '3': 92.6 - Math.max(parseInt(pity5) - 62, 0) * 7 - Math.max(parseInt(pity4) - 8, 0) * 66,
+            '4': 97.55 - Math.max(parseInt(pity5) - 62, 0) * 7 - Math.max(parseInt(pity4) - 8, 0) * 33,
+            '4up': 99.2 - Math.max(parseInt(pity5) - 62, 0) * 7 - Math.max(parseInt(pity4) - 8, 0) * 33,
+            '5': 99.4 - Math.max(parseInt(pity5) - 62, 0) * 3.5,
             '5up': 100,
         }
 
         const orientedRates = banner === 'characters' ? characterRates : lightConeRates;
 
-        console.table(orientedRates);
-
         // If reach 5* pity
         if (pity === pityCount5) {
             // win 50/50 if user have already lost
-            if (pity) result = winFifty5(banner, id);
+            if (fifty5) result = winFifty5(banner, id);
             else result = rng <= 0.5 ? winFifty5(banner, id) : loseFifty5(banner, id);
 
             // Skip this roll
@@ -61,7 +59,7 @@ function gachaOriented(banner, id) {
         // If reach 4* pity
         if (pity === 9) {
             // win 50/50 if user have already lost
-            if (pity) result = winFifty4(banner, id);
+            if (fifty4) result = winFifty4(banner, id);
             else result = rng <= 0.5 ? winFifty4(banner, id) : loseFifty4(banner, id);
 
             // Skip this roll
@@ -77,7 +75,7 @@ function gachaOriented(banner, id) {
 
         // lose 4* 50/50 (unless if user have already lost once)
         if (rng >= orientedRates['3'] && rng < orientedRates['4']) {
-            if (!pity) result = loseFifty4(banner, id);
+            if (!fifty4) result = loseFifty4(banner, id);
             else result = winFifty4(banner, id);
         }
 
@@ -86,7 +84,7 @@ function gachaOriented(banner, id) {
 
         // lose 5* 50/50 (unless if user have already lost once)
         if (rng >= orientedRates['4up'] && rng < orientedRates['5']) {
-            if (!pity) result = loseFifty5(banner, id, pity);
+            if (!fifty5) result = loseFifty5(banner, id, pity);
             else result = winFifty5(banner, id, pity);
         }
 
