@@ -6,9 +6,9 @@ function gachaOriented(banner, id) {
     // Declare variables
     let result;
     let rng;
+    let pity4, pity5, fifty4, fifty5;
     const results = [];
     const pityCount5 = banner === 'characters' ? 89 : 79;
-    const orientedRates = banner === 'characters' ? characterRates : lightConeRates;
 
     // Add user to db if there is no record
     isExist = db.prepare(`SELECT 1 FROM users WHERE user_id=?`).get(id);
@@ -18,21 +18,39 @@ function gachaOriented(banner, id) {
     for (let i = 0; i < 10; i++) {
 
         // Query pity count of 4* and 5* of user
-        let pity4 = db.prepare(`SELECT pity_4_${banner} FROM users WHERE user_id=?`).get(id);
-        pity4 = pity4[`pity_4_${banner}`];
-        let pity5 = db.prepare(`SELECT pity_5_${banner} FROM users WHERE user_id=?`).get(id);
-        pity5 = pity5[`pity_5_${banner}`];
+        let pity = db.prepare(`SELECT pity_4_${banner}, pity_5_${banner}, fifty_4_${banner}, fifty_5_${banner} FROM users WHERE user_id=?`).get(id);
+        pity4 = pity[`pity_4_${banner}`];
+        pity5 = pity[`pity_5_${banner}`];
 
         // Query 50/50 status of 4* and 5* of user
-        let fifty4 = db.prepare(`SELECT fifty_4_${banner} FROM users WHERE user_id=?`).get(id);
-        fifty4 = fifty4[`fifty_4_${banner}`];
-        let fifty5 = db.prepare(`SELECT fifty_5_${banner} FROM users WHERE user_id=?`).get(id);
-        fifty5 = fifty5[`fifty_5_${banner}`];
+        fifty4 = pity[`fifty_4_${banner}`];
+        fifty5 = pity[`fifty_5_${banner}`];
+
+        // Rate (Accounted for soft pity)
+        const characterRates = {
+            '3': 94.3 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 73, 0) * 6,
+            '4': 96.85 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 73, 0) * 6,
+            '4up': 99.4 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 73, 0) * 6,
+            '5': 99.7 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 73, 0) * 3,
+            '5up': 100,
+        }
+        
+        const lightConeRates = {
+            '3': 92.6 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 62, 0) * 7,
+            '4': 97.55 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 62, 0) * 7,
+            '4up': 99.2 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 62, 0) * 7,
+            '5': 99.4 - Math.max(parseInt(pity[`pity_5_${banner}`]) - 62, 0) * 3.5,
+            '5up': 100,
+        }
+
+        const orientedRates = banner === 'characters' ? characterRates : lightConeRates;
+
+        console.table(orientedRates);
 
         // If reach 5* pity
-        if (pity5 === pityCount5) {
+        if (pity === pityCount5) {
             // win 50/50 if user have already lost
-            if (fifty5) result = winFifty5(banner, id);
+            if (pity) result = winFifty5(banner, id);
             else result = rng <= 0.5 ? winFifty5(banner, id) : loseFifty5(banner, id);
 
             // Skip this roll
@@ -41,9 +59,9 @@ function gachaOriented(banner, id) {
         }
         
         // If reach 4* pity
-        if (pity4 === 9) {
+        if (pity === 9) {
             // win 50/50 if user have already lost
-            if (fifty4) result = winFifty4(banner, id);
+            if (pity) result = winFifty4(banner, id);
             else result = rng <= 0.5 ? winFifty4(banner, id) : loseFifty4(banner, id);
 
             // Skip this roll
@@ -59,7 +77,7 @@ function gachaOriented(banner, id) {
 
         // lose 4* 50/50 (unless if user have already lost once)
         if (rng >= orientedRates['3'] && rng < orientedRates['4']) {
-            if (!fifty4) result = loseFifty4(banner, id);
+            if (!pity) result = loseFifty4(banner, id);
             else result = winFifty4(banner, id);
         }
 
@@ -68,33 +86,17 @@ function gachaOriented(banner, id) {
 
         // lose 5* 50/50 (unless if user have already lost once)
         if (rng >= orientedRates['4up'] && rng < orientedRates['5']) {
-            if (!fifty5) result = loseFifty5(banner, id, pity4);
-            else result = winFifty5(banner, id, pity4);
+            if (!pity) result = loseFifty5(banner, id, pity);
+            else result = winFifty5(banner, id, pity);
         }
 
         // win 5* 50/50
-        if (rng >= orientedRates['5'] && rng <= orientedRates['5up']) result = winFifty5(banner, id, pity4);
+        if (rng >= orientedRates['5'] && rng <= orientedRates['5up']) result = winFifty5(banner, id, pity);
 
         results.push(result);
     }
 
     return results;
-}
-    
-const characterRates = {
-    '3': 94.3,
-    '4': 96.85,
-    '4up': 99.4,
-    '5': 99.7,
-    '5up': 100,
-}
-
-const lightConeRates = {
-    '3': 92.6,
-    '4': 97.55,
-    '4up': 99.2,
-    '5': 99.4,
-    '5up': 100,
 }
 
 const types = ['characters', 'light_cones'];
@@ -102,8 +104,7 @@ const types = ['characters', 'light_cones'];
 function warp3(banner, id) {
     let result = db.prepare(`SELECT name FROM light_cones WHERE rarity=3 AND is_gacha IS NULL ORDER BY RANDOM() LIMIT 1`).get();
     
-    db.prepare(`UPDATE users SET pity_4_${banner}=pity_4_${banner}+1 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET pity_5_${banner}=pity_5_${banner}+1 WHERE user_id=?`).run(id);
+    db.prepare(`UPDATE users SET pity_4_${banner}=pity_4_${banner}+1, pity_5_${banner}=pity_5_${banner}+1 WHERE user_id=?`).run(id);
 
     return result.name;
 }
@@ -111,9 +112,7 @@ function warp3(banner, id) {
 function loseFifty4(banner, id) {
     let result = db.prepare(`SELECT name FROM ${types[Math.floor(Math.random() * types.length)]} WHERE rarity=4 AND is_gacha IS NULL AND name NOT IN (${"'" + currentUp[banner]['4'].join("', '") + "'"}) ORDER BY RANDOM() LIMIT 1`).get();
     
-    db.prepare(`UPDATE users SET pity_4_${banner}=0 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET pity_5_${banner}=pity_5_${banner}+1 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET fifty_4_${banner}=true WHERE user_id=?`).run(id);
+    db.prepare(`UPDATE users SET pity_4_${banner}=0, pity_5_${banner}=pity_5_${banner}+1, fifty_4_${banner}=true WHERE user_id=?`).run(id);
 
     return result.name;
 }
@@ -123,9 +122,7 @@ function winFifty4(banner, id) {
     result = currentUp[banner]['4'][Math.floor(Math.random() * currentUp[banner]['4'].length)];
 
     // Update db
-    db.prepare(`UPDATE users SET pity_5_${banner}=pity_5_${banner}+1 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET pity_4_${banner}=0 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET fifty_4_${banner}=false WHERE user_id=?`).run(id);
+    db.prepare(`UPDATE users SET pity_5_${banner}=pity_5_${banner}+1, pity_4_${banner}=0, fifty_4_${banner}=false WHERE user_id=?`).run(id);
 
     return result;
 }
@@ -134,8 +131,7 @@ function loseFifty5(banner, id, pity4) {
     let result = db.prepare(`SELECT name FROM ${banner} WHERE rarity=5 AND is_gacha IS NULL AND NOT name='${currentUp[banner]['5']}' ORDER BY RANDOM() LIMIT 1`).get();
     
     if (pity4 !== 9) db.prepare(`UPDATE users SET pity_4_${banner}=pity_4_${banner}+1 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET pity_5_${banner}=0 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET fifty_5_${banner}=true WHERE user_id=?`).run(id);
+    db.prepare(`UPDATE users SET pity_5_${banner}=0, fifty_5_${banner}=true WHERE user_id=?`).run(id);
 
     return result.name;
 }
@@ -145,9 +141,8 @@ function winFifty5(banner, id, pity4) {
     result = currentUp[banner]['5'];
 
     // Update db
-    db.prepare(`UPDATE users SET pity_5_${banner}=0 WHERE user_id=?`).run(id);
+    db.prepare(`UPDATE users SET pity_5_${banner}=0, fifty_5_${banner}=false WHERE user_id=?`).run(id);
     if (pity4 !== 9) db.prepare(`UPDATE users SET pity_4_${banner}=pity_4_${banner}+1 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET fifty_5_${banner}=false WHERE user_id=?`).run(id);
 
     return result;
 }
