@@ -28,7 +28,7 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         if (TIMEOUT[interaction.user.id]) {
-            interaction.editReply(`Please try again in ${5000 - new Date().getTime() + TIMEOUT[interaction.user.id]}ms`);
+            interaction.editReply(`Please try again in ${2000 - new Date().getTime() + TIMEOUT[interaction.user.id]}ms`);
             return;
         }
 
@@ -38,7 +38,7 @@ module.exports = {
             TIMEOUT[interaction.user.id] = new Date().getTime();
             setTimeout(() => {
                 delete TIMEOUT[interaction.user.id];
-            }, 5000)
+            }, 2000)
 
             // Gacha
             let results = [];
