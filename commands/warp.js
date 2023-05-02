@@ -42,7 +42,7 @@ module.exports = {
 
             // Gacha
             let results = [];
-            results = banner === 'standard' ? gachaStandard(banner, interaction.user.id) : gachaOriented(banner, interaction.user.id);
+            results = banner === 'standard' ? gachaStandard(interaction.user.id) : gachaOriented(banner, interaction.user.id);
             
             // Loop through results
             const images = [];
@@ -69,18 +69,18 @@ module.exports = {
                         }
                     }
             
-                    // Composite image
-                    await sharp("./images/assets/card_template/small_background.png")
-                        .composite(images)
-                        .toFile(`tmp_${banner}.png`);
-
-                const file = new AttachmentBuilder(`./tmp_${banner}.png`);
-
-                let pity5 = db.prepare(`SELECT pity_5_${banner} FROM users WHERE user_id=?`).get(interaction.user.id);
-                pity5 = pity5[`pity_5_${banner}`];
-
-                // Send the image
-                await interaction.editReply({ content: `<@${interaction.member.id}> Pity count: ${pity5}`, files: [file] });
+            // Composite image
+            await sharp("./images/assets/card_template/small_background.png")
+                .composite(images)
+                .toFile(`tmp_${banner}.png`);
+                
+            // Send the image
+            const file = new AttachmentBuilder(`./tmp_${banner}.png`);
+                
+            let pity5 = db.prepare(`SELECT pity_5_${banner} FROM users WHERE user_id=?`).get(interaction.user.id);
+            pity5 = pity5[`pity_5_${banner}`];
+                    
+            await interaction.editReply({ content: `<@${interaction.member.id}> Pity count: ${pity5}`, files: [file] });
         })
     }
 }
