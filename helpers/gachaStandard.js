@@ -1,7 +1,7 @@
 const Database = require("better-sqlite3");
 const db = new Database("./honkai.db");
 
-function gachaStandard(banner, id) {
+function gachaStandard(id) {
 
     let result;
     let rng;
@@ -13,29 +13,38 @@ function gachaStandard(banner, id) {
 
     // Roll 10 times
     for (let i = 0; i < 10; i++) {
-        let pity4 = db.prepare(`SELECT pity_4_${banner} FROM users WHERE user_id=?`).get(id);
-        let pity5 = db.prepare(`SELECT pity_5_${banner} FROM users WHERE user_id=?`).get(id);
+        let pity = db.prepare(`SELECT pity_4_standard, pity_5_standard FROM users WHERE user_id=?`).get(id);
 
-        if (pity5[`pity_5_${banner}`] === 89) {
+        // Rate (also accounting for the soft pity)
+        const standardRates = {
+            '3': 94.3 - Math.max(parseInt(pity[`pity_5_standard`]) - 75, 0) * 6,
+            '4': 99.4 - Math.max(parseInt(pity[`pity_5_standard`]) - 75, 0) * 6,
+            '5': 100,
+        }
+
+        console.log(pity[`pity_5_standard`]);
+
+        console.table(standardRates);
+
+        if (pity[`pity_5_standard`] === 89) {
             
             // Return 5* character
             result = db.prepare(`SELECT name FROM ${types[Math.floor(Math.random() * types.length)]} WHERE rarity=5 AND is_gacha IS NULL ORDER BY RANDOM() LIMIT 1`).get();
             results.push(result.name);
             
             // Update pity and skip this roll
-            db.prepare(`UPDATE users SET pity_5_${banner}=0 WHERE user_id=?`).run(id);
+            db.prepare(`UPDATE users SET pity_5_standard=0 WHERE user_id=?`).run(id);
             continue;
             }
 
-        if (pity4[`pity_4_${banner}`] === 9) {
+        if (pity[`pity_4_standard`] === 9) {
 
             // Return 4* character
             result = db.prepare(`SELECT name FROM ${types[Math.floor(Math.random() * types.length)]} WHERE rarity=4 AND is_gacha IS NULL ORDER BY RANDOM() LIMIT 1`).get();
             results.push(result.name);
             
             // Update pity and skip this roll
-            db.prepare(`UPDATE users SET pity_4_${banner}=0 WHERE user_id=?`).run(id);
-            db.prepare(`UPDATE users SET pity_5_${banner}=pity_5_${banner}+1 WHERE user_id=?`).run(id);
+            db.prepare(`UPDATE users SET pity_4_standard=0, pity_5_standard = pity_5_standard + 1 WHERE user_id=?`).run(id);
             continue;
         }
 
@@ -43,13 +52,13 @@ function gachaStandard(banner, id) {
         rng = Math.random() * 100;
 
         // 3*
-        if (rng >= 0 && rng < standardRates['3']) result = warp3(banner, id);
+        if (rng >= 0 && rng < standardRates['3']) result = warp3standard(id);
 
         // 4*
-        if (rng >= standardRates['3'] && rng < standardRates['4']) result = warp4(banner, id);
+        if (rng >= standardRates['3'] && rng < standardRates['4']) result = warp4standard(id);
 
         // SSR
-        if (rng >= standardRates['4'] && rng <= standardRates['5']) result = warp5standard(banner, id);
+        if (rng >= standardRates['4'] && rng <= standardRates['5']) result = warp5standard(id);
 
         results.push(result);
     }
@@ -57,38 +66,28 @@ function gachaStandard(banner, id) {
     return results;
 }
 
-    
-const standardRates = {
-    '3': 94.3,
-    '4': 99.4,
-    '5': 100,
-}
-
 const types = ['characters', 'light_cones'];
 
-function warp3(banner, id) {
+function warp3standard(id) {
     let result = db.prepare(`SELECT name FROM light_cones WHERE rarity=3 AND is_gacha IS NULL ORDER BY RANDOM() LIMIT 1`).get();
     
-    db.prepare(`UPDATE users SET pity_4_${banner}=pity_4_${banner}+1 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET pity_5_${banner}=pity_5_${banner}+1 WHERE user_id=?`).run(id);
+    db.prepare(`UPDATE users SET pity_4_standard = pity_4_standard + 1, pity_5_standard = pity_5_standard + 1 WHERE user_id=?`).run(id);
 
     return result.name;
 }
 
-function warp4(banner, id) {
+function warp4standard(id) {
     let result = db.prepare(`SELECT name FROM ${types[Math.floor(Math.random() * types.length)]} WHERE rarity=4 AND is_gacha IS NULL ORDER BY RANDOM() LIMIT 1`).get();
     
-    db.prepare(`UPDATE users SET pity_4_${banner}=0 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET pity_5_${banner}=pity_5_${banner}+1 WHERE user_id=?`).run(id);
+    db.prepare(`UPDATE users SET pity_4_standard=0, pity_5_standard = pity_5_standard + 1 WHERE user_id=?`).run(id);
 
     return result.name;
 }
 
-function warp5standard(banner, id) {
-    let result = db.prepare(`SELECT name FROM ${types[Math.floor(Math.random() * types.length)]} WHERE rarity=5 AND is_gacha AND NOT name='Seele' IS NULL ORDER BY RANDOM() LIMIT 1`).get();
+function warp5standard(id) {
+    let result = db.prepare(`SELECT name FROM ${types[Math.floor(Math.random() * types.length)]} WHERE rarity=5 AND is_gacha IS NULL AND NOT name='Seele' ORDER BY RANDOM() LIMIT 1`).get();
     
-    db.prepare(`UPDATE users SET pity_4_${banner}=pity_4_${banner}+1 WHERE user_id=?`).run(id);
-    db.prepare(`UPDATE users SET pity_5_${banner}=0 WHERE user_id=?`).run(id);
+    db.prepare(`UPDATE users SET pity_4_standard = pity_4_standard + 1, pity_5_standard=0 WHERE user_id=?`).run(id);
 
     return result.name;
 }
