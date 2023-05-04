@@ -17,14 +17,10 @@ function gachaStandard(id) {
 
         // Rate (also accounting for the soft pity)
         const standardRates = {
-            '3': 94.3 - Math.max(parseInt(pity[`pity_5_standard`]) - 75, 0) * 6,
+            '3': 94.3 - Math.max(parseInt(pity[`pity_5_standard`]) - 75, 0) * 6 - Math.max(parseInt(pity[`pity_4_standard`]) - 8, 0) * 51,
             '4': 99.4 - Math.max(parseInt(pity[`pity_5_standard`]) - 75, 0) * 6,
             '5': 100,
         }
-
-        console.log(pity[`pity_5_standard`]);
-
-        console.table(standardRates);
 
         if (pity[`pity_5_standard`] === 89) {
             
