@@ -25,39 +25,40 @@ async function autoUpdate() {
                 .run(json2[i].name, json2[i].slug, json2[i].rarity, jsonChar.isReleased);
 
             let resChar = await fetch(`https://www.prydwen.gg${jsonChar.smallImage.localFile.childImageSharp.gatsbyImageData.images.fallback.src}`);
-            resChar.body.pipe(fs.createWriteStream(`./chartmp.png`));
+            await resChar.body.pipe(fs.createWriteStream(`./images/original/characters_small/${jsonChar[i].name}.png`));
     
             // ! Create card image
             // Resize
-            await sharp(`./chartmp.png`)
+            await sharp(`./images/original/characters_small/${jsonChar[i].name}.png`)
                 .resize({
                     width: 341,
                     height: 238,
                 })
-                .toFile(`./images/original/characters/${jsonChar.name}.png`);
+                .toFile(`./images/original/characters/${jsonChar[i].name}.png`);
 
             // Design
-            await sharp(`./images/assets/card_template/${jsonChar.rarity}.png`)
+            await sharp(`./images/assets/card_template/${jsonChar[i].rarity}.png`)
                 .composite([
                     {
-                        input: `./images/original/characters/${jsonChar.name}.png`,
+                        input: `./images/original/characters/${jsonChar[i].name}.png`,
                         top: 81,
                         left: 213,
                     },
                     {
-                        input: `./images/assets/elements/ele_${jsonChar.element}.png`,
+                        input: `./images/original/elements/ele_${jsonChar[i].element.toLowerCase()}.png`,
                         top: 215,
                         left: 180,
                     },
                 ])
-                .toFile(`./images/assets/cards/${jsonChar.name}.png`)
+                .toFile(`./images/original/cards/${jsonChar[i].name}.png`)
 
-                await sharp(`./images/assets/cards/${jsonChar.name}.png`)
+            await sharp(`./images/original/cards/${jsonChar[i].name}.png`)
                 .resize({
                     width: 336,
                     height: 224
                 })
-                .toFile(`./images/assets/rotated_cards/${jsonChar.name}.png`)
+                .rotate(-15, { background: "#00000000" })
+                .toFile(`./images/assets/rotated_cards/${jsonChar[i].name}.png`)
         }
     }
     // Light cones
@@ -65,7 +66,7 @@ async function autoUpdate() {
     let lCJson = await lightCones.json();
     lCJson = lCJson.result.data.allCharacters.nodes;
 
-    const CurrentLightCones = db.prepare("SELECT name FROM light_cones;").all();
+    const CurrentLightCones = db.prepare("SELECT name FROM light_cones WHERE id<50;").all();
 
     for (let i = 0; i < lCJson.length; i++) {
         let coneSmallImage = lCJson[i].smallImage.localFile.childImageSharp.gatsbyImageData.images.fallback.src;
@@ -84,46 +85,57 @@ async function autoUpdate() {
                 .run(lCJson[i].name, lCJson[i].slug, coneSmallImage, lCJson[i].rarity, lCJson[i].path, skill, lCJson[i].stats.hp.value_level_max, lCJson[i].stats.atk.value_level_max, lCJson[i].stats.def.value_level_max);
         
             let resCone = await fetch(`https://www.prydwen.gg${coneSmallImage}`);
-            resCone.body.pipe(fs.createWriteStream(`./conetmp.png`));
-    
-            // ! Create card image
+            let stream = await resCone.body.pipe(fs.createWriteStream(`./images/original/light_cones_small/${lCJson[i].name}.png`));
 
-            const LEFTS = {
-                '3': 166,
-                '4': 171,
-                '5': 196
-            }
+            await stream.on('finish', async () => {
+                    // ! Create card image
+                    const LEFTS = {
+                        '3': 166,
+                        '4': 171,
+                        '5': 196
+                    }
 
-            // Resize
-            await sharp(`./conetmp.png`)
-                .resize({
-                    width: 305,
-                    height: 320,
-                })
-                .toFile(`./images/original/light_cones/${lCJson.name}.png`);
+                    // Resize
+                    await sharp(`./images/original/light_cones_small/${lCJson[i].name}.png`)
+                        .resize({
+                            width: 305,
+                            height: 320,
+                        })
+                        .toFile(`./images/original/light_cones/${lCJson[i].name}.png`);
 
-            // Design
-            await sharp(`./images/assets/card_template/${lCJson.rarity}.png`)
-                .composite([
-                    {
-                        input: `./images/original/light_cones/${lCJson.name}.png`,
-                        top: 70,
-                        left: 288,
-                    },
-                    {
-                        input: `./images/assets/paths/path_${lCJson.path}.png`,
-                        top: 215,
-                        left: LEFTS[lCJson.rarity.toString()],
-                    },
-                ])
-                .toFile(`./images/assets/cards/${lCJson.name}.png`)
-            
-            await sharp(`./images/assets/cards/${lCJson.name}.png`)
-                .resize({
-                    width: 336,
-                    height: 224
-                })
-                .toFile(`./images/assets/rotated_cards/${lCJson.name}.png`)
+                    // Cut
+                    await sharp(`./images/original/light_cones_small/${lCJson[i].name}.png`)
+                        .resize({
+                            width: 305,
+                            height: 251,
+                            position: 'top'
+                        })
+                        .toFile(`./images/original/cone_cards/${lCJson[i].name}.png`)
+
+                    // Design
+                    await sharp(`./images/assets/card_template/cone_${lCJson[i].rarity}.png`)
+                        .composite([
+                            {
+                                input: `./images/original/cone_cards/${lCJson[i].name}.png`,
+                                top: 70,
+                                left: 288,
+                            },
+                            {
+                                input: `./images/original/paths/path_${lCJson[i].path.toLowerCase()}.png`,
+                                top: 175,
+                                left: LEFTS[lCJson[i].rarity.toString()],
+                            },
+                        ])
+                        .toFile(`./images/original/cards/${lCJson[i].name}.png`)
+                    
+                    await sharp(`./images/original/cards/${lCJson[i].name}.png`)
+                        .resize({
+                            width: 336,
+                            height: 224
+                        })
+                        .rotate(-15, { background: "#00000000" })
+                        .toFile(`./images/assets/rotated_cards/${lCJson[i].name}.png`)
+            });
         }
     }
 
