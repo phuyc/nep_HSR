@@ -30,7 +30,7 @@ function gachaOriented(banner, id) {
         const characterRates = {
             '3': 94.3 - Math.max(parseInt(pity5) - 73, 0) * 6 - Math.max(parseInt(pity4) - 8, 0) * 51,
             '4': 96.85 - Math.max(parseInt(pity5) - 73, 0) * 6 - Math.max(parseInt(pity4) - 8, 0) * 25.5,
-            '4up': 99.4 - Math.max(parseInt(pity5) - 73, 0) * 6 - Math.max(parseInt(pity4) - 8, 0) * 25.5,
+            '4up': 99.4 - Math.max(parseInt(pity5) - 73, 0) * 6,
             '5': 99.7 - Math.max(parseInt(pity5) - 73, 0) * 3,
             '5up': 100,
         }
@@ -38,8 +38,8 @@ function gachaOriented(banner, id) {
         const lightConeRates = {
             '3': 92.6 - Math.max(parseInt(pity5) - 62, 0) * 7 - Math.max(parseInt(pity4) - 8, 0) * 66,
             '4': 97.55 - Math.max(parseInt(pity5) - 62, 0) * 7 - Math.max(parseInt(pity4) - 8, 0) * 33,
-            '4up': 99.2 - Math.max(parseInt(pity5) - 62, 0) * 7 - Math.max(parseInt(pity4) - 8, 0) * 33,
-            '5': 99.4 - Math.max(parseInt(pity5) - 62, 0) * 3.5,
+            '4up': 99.2 - Math.max(parseInt(pity5) - 62, 0) * 7,
+            '5': 99.4 - Math.max(parseInt(pity5) - 62, 0) * 5.25,
             '5up': 100,
         }
 
