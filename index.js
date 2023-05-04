@@ -2,11 +2,11 @@ const { GatewayIntentBits } = require("discord.js");
 const Discord = require("discord.js")
 const fs = require('node:fs');
 const path = require('node:path');
-const { autoUpdate } = require("./helpers/update");
 
 require("dotenv").config();
 
-// TODO Improve autoUpdate
+// TODO: clean up honkai.db
+// TODO: pick the new light cone and commit (Some just have their name changes)
 
 const client = new Discord.Client({
 	intents: [GatewayIntentBits.Guilds, 		
@@ -41,11 +41,3 @@ for (const file of eventFiles) {
 
 
 client.login(process.env.TOKEN);
-
-setInterval(async () => {
-	try {
-		await autoUpdate();
-	} catch (error) {
-	console.error(error);	
-	}
-}, 259200000);
