@@ -95,7 +95,6 @@ function gachaOriented(banner, id) {
         // win 5* 50/50
         if (rng >= orientedRates['5'] && rng <= orientedRates['5up']) result = winFifty5(banner, id, pity4);
 
-        console.log(pity4, result);
         results.push(result);
     }
 
