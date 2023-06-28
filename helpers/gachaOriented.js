@@ -112,7 +112,8 @@ function warp3(banner, id) {
 }
 
 function loseFifty4(banner, id) {
-    let result = db.prepare(`SELECT name FROM ${types[Math.floor(Math.random() * types.length)]} WHERE rarity=4 AND is_gacha IS NULL AND name NOT IN (${"'" + currentUp[banner]['4'].join("', '") + "'"}) ORDER BY RANDOM() LIMIT 1`).get();
+    let fourStar = `'${currentUp[banner]['4'][0]}', '${currentUp[banner]['4'][1].replace("'", "''")}', '${currentUp[banner]['4'][2]}'`;
+    let result = db.prepare(`SELECT name FROM ${types[Math.floor(Math.random() * types.length)]} WHERE rarity=4 AND is_gacha IS NULL AND name NOT IN (${fourStar}) ORDER BY RANDOM() LIMIT 1`).get();
     
     db.prepare(`UPDATE users SET pity_4_${banner}=0, pity_5_${banner}=pity_5_${banner}+1, fifty_4_${banner}=true WHERE user_id=?`).run(id);
 
@@ -155,8 +156,8 @@ const currentUp = {
         '5': 'Luocha'
     },
     'light_cones': {
-        '4': ['Good Night and Sleep Well', "Geniuses' Repose", 'Dance! Dance! Dance!'],
-        '5': 'Echoes of the Coffin'
+        '4': ['Good Night and Sleep Well ', "Geniuses' Repose", 'Dance! Dance! Dance!'],
+        '5': 'Echoes of the Coffin '
     }
 }
 
