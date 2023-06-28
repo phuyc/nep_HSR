@@ -151,12 +151,12 @@ function winFifty5(banner, id, pity4) {
 
 const currentUp = {
     'characters': {
-        '4': ['Dan Heng', 'Asta', 'Serval'],
-        '5': 'Silver Wolf'
+        '4': ['Pela', 'Qingque', 'Yukong'],
+        '5': 'Luocha'
     },
     'light_cones': {
-        '4': ['Make the World Clamor', 'Subscribe for More!', 'Memories of the Past '],
-        '5': 'Incessant Rain'
+        '4': ['Good Night and Sleep Well', "Geniuses' Repose", 'Dance! Dance! Dance!'],
+        '5': 'Echoes of the Coffin'
     }
 }
 
