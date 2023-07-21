@@ -152,12 +152,12 @@ function winFifty5(banner, id, pity4) {
 
 const currentUp = {
     'characters': {
-        '4': ['Pela', 'Qingque', 'Yukong'],
-        '5': 'Luocha'
+        '4': ['Natasha', 'Sushang', 'Arlan'],
+        '5': 'Blade'
     },
     'light_cones': {
-        '4': ['Good Night and Sleep Well ', "Geniuses' Repose", 'Dance! Dance! Dance!'],
-        '5': 'Echoes of the Coffin '
+        '4': ['A Secret Vow', "Swordplay", 'Shared Feeling'],
+        '5': 'The Unreachable Side'
     }
 }
 
