@@ -9,10 +9,10 @@ require("dotenv").config();
 // TODO: pick the new light cone and commit (Some just have their name changes)
 
 const client = new Discord.Client({
-	intents: [GatewayIntentBits.Guilds, 		
-			  GatewayIntentBits.GuildMessages,
-			  GatewayIntentBits.MessageContent
-		]});
+	intents: [
+		GatewayIntentBits.Guilds, 		
+		GatewayIntentBits.GuildMessages
+			]});
 
 // Read all commands
 client.commands = new Discord.Collection();
