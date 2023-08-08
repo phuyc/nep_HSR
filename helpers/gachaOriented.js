@@ -152,12 +152,12 @@ function winFifty5(banner, id, pity4) {
 
 const currentUp = {
     'characters': {
-        '4': ['Natasha', 'Sushang', 'Arlan'],
-        '5': 'Blade'
+        '4': ['Luka', 'Serval', 'Sampo'],
+        '5': 'Kafka'
     },
     'light_cones': {
-        '4': ['A Secret Vow', "Swordplay", 'Shared Feeling'],
-        '5': 'The Unreachable Side'
+        '4': ['The Birth of the Self', "Eyes of the Prey ", 'Resolution Shines As Pearls of Sweat'],
+        '5': 'Patience is All You Need'
     }
 }
 
