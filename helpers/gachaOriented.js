@@ -152,12 +152,12 @@ function winFifty5(banner, id, pity4) {
 
 const currentUp = {
     'characters': {
-        '4': ['Luka', 'Serval', 'Sampo'],
-        '5': 'Kafka'
+        '4': ['Lynx', 'Hook', 'Pela'],
+        '5': 'Fu Xuan'
     },
     'light_cones': {
-        '4': ['The Birth of the Self', "Eyes of the Prey ", 'Resolution Shines As Pearls of Sweat'],
-        '5': 'Patience is All You Need'
+        '4': ['Perfect Timing', "Under the Blue Sky", 'Trend of the Universal Market'],
+        '5': 'She Already Shut Her Eyes'
     }
 }
 
