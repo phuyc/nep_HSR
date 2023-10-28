@@ -21,7 +21,7 @@ module.exports = {
             option.setName('banner')
                 .setDescription('Type of banner')
                 .setChoices(
-                    { name: 'Character Oriented Banner', value: 'banner'},
+                    { name: 'Character Oriented Banner', value: 'characters'},
                     { name: 'Light Cones Oriented Banner', value: 'light_cones'},
                     { name: 'Standard Banner', value: 'standard'},
                 )
